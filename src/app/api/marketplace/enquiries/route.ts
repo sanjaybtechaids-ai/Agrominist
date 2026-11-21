@@ -1,0 +1,5 @@
+import { z } from 'zod';
+import { handleApiError, ok, parseJson, SupabaseRequestError } from '@/lib/api';
+import { database, requireRole } from '@/lib/supabase';
+const schema = z.object({ productId: z.string().uuid(), message: z.string().trim().min(2).max(1000) });
+export async function POST(request: Request) { try { const body = await parseJson(request, schema); const { user, token } = await requireRole(request, 'CUSTOMER'); const [product] = await database<Array<{ farmer_id: string }>>(`marketplace_products?id=eq.${body.productId}&status=eq.active&select=farmer_id`, {}, token); if (!product) throw new SupabaseRequestError(404, 'NOT_FOUND', 'Marketplace product not found.'); const [row] = await database<Array<unknown>>('marketplace_enquiries', { method: 'POST', headers: { Prefer: 'return=representation', 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: body.productId, customer_id: user.id, farmer_id: product.farmer_id, enquiry_message: body.message }) }, token); return ok(row, 201); } catch (error) { return handleApiError(error); } }
