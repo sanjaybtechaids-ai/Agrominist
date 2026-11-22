@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { translations } from '@/constants/translations';
 import {
@@ -22,19 +21,9 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
-  const router = useRouter();
-  const { loginAsFarmer, loginAsCustomer, language, setLanguage, setVoiceModalOpen } = useAppStore();
+  const { language, setLanguage, setVoiceModalOpen } = useAppStore();
   const t = translations[language] || translations.en;
 
-  const handleEnterFarmer = () => {
-    loginAsFarmer();
-    router.push('/farmer/dashboard');
-  };
-
-  const handleEnterCustomer = () => {
-    loginAsCustomer();
-    router.push('/customer/marketplace');
-  };
 
   return (
     <div className="min-h-screen bg-agriBg flex flex-col text-agriText">
@@ -63,12 +52,7 @@ export default function HomePage() {
             <span>Voice Assistant</span>
           </button>
 
-          <Link
-            href="/login"
-            className="px-4 py-2 bg-forest-600 hover:bg-forest-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
-          >
-            Sign In / Demo
-          </Link>
+          <Link href="/farmer/dashboard" className="px-4 py-2 bg-forest-600 hover:bg-forest-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors">Open dashboard</Link>
         </div>
       </header>
 
@@ -92,9 +76,8 @@ export default function HomePage() {
 
         {/* Dual Role Direct Entry Action Cards */}
         <div className="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
-          <button
-            type="button"
-            onClick={handleEnterFarmer}
+          <Link
+            href="/farmer/dashboard"
             className="p-5 rounded-2xl bg-white border-2 border-forest-600 hover:bg-forest-50/50 text-left shadow-sm hover:shadow transition-all group flex flex-col justify-between"
           >
             <div>
@@ -109,14 +92,13 @@ export default function HomePage() {
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-forest-700">
-              <span>Demo Login: farmer@agronomist.demo</span>
+              <span>Open farmer workspace</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
-          </button>
+          </Link>
 
-          <button
-            type="button"
-            onClick={handleEnterCustomer}
+          <Link
+            href="/customer/marketplace"
             className="p-5 rounded-2xl bg-white border-2 border-leaf-600 hover:bg-leaf-50/50 text-left shadow-sm hover:shadow transition-all group flex flex-col justify-between"
           >
             <div>
@@ -131,10 +113,10 @@ export default function HomePage() {
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-leaf-700">
-              <span>Demo Login: customer@agronomist.demo</span>
+              <span>Browse marketplace</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -213,13 +195,11 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <Sprout className="w-4 h-4 text-forest-600" />
             <span className="font-bold text-agriText">Agronomist Platform</span>
-            <span>• Demonstration Version</span>
+            <span>• Agricultural advisory and marketplace</span>
           </div>
           <div className="flex items-center gap-4 text-[11px]">
             <span>Thanjavur, Tamil Nadu • Indian Agriculture Tech</span>
-            <Link href="/login" className="text-forest-700 font-bold hover:underline">
-              Demo Accounts
-            </Link>
+            <Link href="/customer/marketplace" className="text-forest-700 font-bold hover:underline">Marketplace</Link>
           </div>
         </div>
       </footer>

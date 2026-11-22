@@ -20,7 +20,7 @@ import {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { language, setLanguage, logout, resetToMockData, offlineEnabled, toggleOfflineMode } = useAppStore();
+  const { language, setLanguage, logout, resetLocalData, offlineEnabled, toggleOfflineMode } = useAppStore();
   const t = translations[language] || translations.en;
 
   // Preferences State
@@ -38,12 +38,12 @@ export default function SettingsPage() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/');
   };
 
   const handleResetData = () => {
-    if (confirm('Reset application data to demonstration defaults?')) {
-      resetToMockData();
+    if (confirm('Clear locally cached application data? Data already saved in your account is not deleted.')) {
+      resetLocalData();
       alert('Mock data successfully restored.');
     }
   };
@@ -205,7 +205,7 @@ export default function SettingsPage() {
         <div className="bg-white p-6 rounded-2xl border border-agriBorder shadow-xs flex items-center justify-between">
           <div>
             <h3 className="font-bold text-xs text-agriText">Active Authentication Session</h3>
-            <p className="text-[11px] text-agriMuted">Development demo credentials active</p>
+            <p className="text-[11px] text-agriMuted">Use your registered account credentials.</p>
           </div>
           <button
             onClick={handleLogout}

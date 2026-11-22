@@ -74,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/');
     setProfileDropdownOpen(false);
   };
 

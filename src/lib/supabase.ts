@@ -5,6 +5,12 @@ const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 function config() {
   if (!baseUrl || !anonKey) throw new SupabaseConfigError('Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.');
+  try {
+    const url = new URL(baseUrl);
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') throw new Error('Unsupported protocol');
+  } catch {
+    throw new SupabaseConfigError('NEXT_PUBLIC_SUPABASE_URL must be a plain http(s) URL.');
+  }
   return { baseUrl, anonKey };
 }
 
@@ -16,8 +22,14 @@ async function request<T>(path: string, init: RequestInit = {}, accessToken?: st
     cache: 'no-store',
   });
   if (!response.ok) {
-    const payload = await response.json().catch(() => null) as { message?: string; error_description?: string; code?: string } | null;
-    throw new SupabaseRequestError(response.status, payload?.code ?? 'SUPABASE_ERROR', payload?.error_description ?? payload?.message ?? 'Database request failed.');
+    const raw = await response.text();
+    const payload = (() => {
+      try { return JSON.parse(raw) as { message?: string; error_description?: string; msg?: string; error?: string; code?: string; error_code?: string }; }
+      catch { return null; }
+    })();
+    const message = payload?.error_description ?? payload?.message ?? payload?.msg ?? payload?.error
+      ?? `Supabase returned HTTP ${response.status}. Check the project URL, API key, Auth settings, and Row Level Security policies.`;
+    throw new SupabaseRequestError(response.status, payload?.error_code ?? payload?.code ?? 'SUPABASE_ERROR', message);
   }
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;

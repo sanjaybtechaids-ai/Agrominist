@@ -12,13 +12,18 @@ import {
   MarketplaceProduct,
   AppNotification,
 } from '@/types';
-import {
-  mockFarmerProfile,
-  mockCustomerProfile,
-  mockLandPlots,
-  mockMarketplaceProducts,
-  mockNotifications,
-} from '@/data/mockData';
+
+const emptyFarmerProfile: FarmerProfile = {
+  id: '', name: '', email: '', phone: '', preferredLanguage: 'en', landArea: 0,
+  measurementUnit: 'Acre', location: { village: '', district: '', state: '', gpsAllowed: false },
+  soilType: 'Unknown', soilStatus: 'unavailable', irrigationFacility: 'none', existingCrops: [],
+  farmingType: 'individual', farmingSchedule: 'full-time', availableWorkers: 0,
+  ownSellingMarket: false, onboardingCompleted: false,
+};
+
+const emptyCustomerProfile: CustomerProfile = {
+  id: '', name: '', email: '', phone: '', location: { district: '', state: '' }, preferredLanguage: 'en',
+};
 
 interface AppState {
   currentRole: UserRole | null;
@@ -53,44 +58,21 @@ interface AppState {
   markAllNotificationsRead: () => void;
   setVoiceModalOpen: (open: boolean) => void;
   toggleOfflineMode: () => void;
-  resetToMockData: () => void;
+  resetLocalData: () => void;
 }
 
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      currentRole: 'farmer',
-      isAuthenticated: true,
+      currentRole: null,
+      isAuthenticated: false,
       language: 'en',
-      farmerProfile: mockFarmerProfile,
-      customerProfile: mockCustomerProfile,
-      landPlots: mockLandPlots,
-      landAllocations: [
-        {
-          id: 'alloc-1',
-          plotName: 'North Parcel (Plot A)',
-          area: 1.0,
-          cropId: 'crop-paddy-ponni',
-          cropName: 'Traditional Samba Paddy (Ponni)',
-          estimatedExpenses: 26500,
-          estimatedYieldKg: 2400,
-          estimatedRevenue: 58800,
-          estimatedProfit: 32300,
-        },
-        {
-          id: 'alloc-2',
-          plotName: 'South Riverway (Plot B)',
-          area: 1.0,
-          cropId: 'crop-blackgram-vbn',
-          cropName: 'Black Gram / Urad (VBN 8)',
-          estimatedExpenses: 9800,
-          estimatedYieldKg: 420,
-          estimatedRevenue: 35700,
-          estimatedProfit: 25900,
-        },
-      ],
-      products: mockMarketplaceProducts,
-      notifications: mockNotifications,
+      farmerProfile: emptyFarmerProfile,
+      customerProfile: emptyCustomerProfile,
+      landPlots: [],
+      landAllocations: [],
+      products: [],
+      notifications: [],
       voiceModalOpen: false,
       offlineEnabled: true,
 
@@ -163,17 +145,20 @@ export const useAppStore = create<AppState>()(
       toggleOfflineMode: () =>
         set((state) => ({ offlineEnabled: !state.offlineEnabled })),
 
-      resetToMockData: () =>
+      resetLocalData: () =>
         set({
-          farmerProfile: mockFarmerProfile,
-          customerProfile: mockCustomerProfile,
-          landPlots: mockLandPlots,
-          products: mockMarketplaceProducts,
-          notifications: mockNotifications,
+          farmerProfile: emptyFarmerProfile,
+          customerProfile: emptyCustomerProfile,
+          landPlots: [],
+          landAllocations: [],
+          products: [],
+          notifications: [],
         }),
     }),
     {
-      name: 'agronomist-app-storage-v1',
+      // v2 deliberately discards the former demo-filled browser cache.
+      name: 'agronomist-app-storage-v2',
+      version: 2,
     }
   )
 );
